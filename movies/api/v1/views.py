@@ -13,9 +13,8 @@ class FilmworkMixinView:
     http_method_names = ['get']
 
     def get_queryset(self):
-        test = Filmwork.objects.values(*self.default_values_list).annotate(
-            genres=ArrayAgg('filmworkgenre__genre__name', distinct=True)
-        ).annotate(
+        return Filmwork.objects.values(*self.default_values_list).annotate(
+            genres=ArrayAgg('filmworkgenre__genre__name', distinct=True),
             writers=ArrayAgg('personfilmwork__person__full_name', filter=Q(personfilmwork__role=PersonRoles.WRITER),
                              distinct=True),
             actors=ArrayAgg('personfilmwork__person__full_name', filter=Q(personfilmwork__role=PersonRoles.ACTOR),
@@ -24,23 +23,27 @@ class FilmworkMixinView:
                                distinct=True)
         )
 
-        print(test)
-        return test
-
     def render_to_response(self, context, **response_kwargs):
         return JsonResponse(context)
 
 
-class MoviesListView(BaseListView):
+class MoviesListView(FilmworkMixinView, BaseListView):
     model = Filmwork
     http_method_names = ['get']
-
-    def get_queryset(self):
-        return ArrayAgg(Filmwork.objects.all().values())
+    paginate_by = 50
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        paginator, page, queryset = self.paginate_queryset(
+            self.get_queryset(),
+            self.paginate_by
+        )
+
         context = {
-            'result': list(self.get_queryset()),
+            'count': paginator.count,
+            'total_pages': paginator.num_pages,
+            'prev': page.previous_page_number() if page.has_previous() else None,
+            'next': page.next_page_number() if page.has_next() else None,
+            'result': list(queryset),
         }
         return context
 
