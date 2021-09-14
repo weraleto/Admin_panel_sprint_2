@@ -3,6 +3,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.views.generic.detail import BaseDetailView
 from django.views.generic.list import BaseListView
+from django.core.paginator import Paginator
 
 from movies.models import Filmwork, PersonRoles
 
@@ -33,17 +34,24 @@ class MoviesListView(FilmworkMixinView, BaseListView):
     paginate_by = 50
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        paginator, page, queryset = self.paginate_queryset(
+        page_number = self.request.GET.get('page') or 1
+        paginator = Paginator(
             self.get_queryset(),
             self.paginate_by
         )
+        if page_number == 'last':
+            page_number = paginator.num_pages
+
+        page = paginator.page(page_number)
+
+        print(page.next_page_number() if page.has_next() else None)
 
         context = {
             'count': paginator.count,
             'total_pages': paginator.num_pages,
             'prev': page.previous_page_number() if page.has_previous() else None,
             'next': page.next_page_number() if page.has_next() else None,
-            'result': list(queryset),
+            'results': list(page.object_list),
         }
         return context
 
