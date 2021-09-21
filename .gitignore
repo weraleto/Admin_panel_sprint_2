@@ -52,4 +52,5 @@ ENV/
 doc.html
 
 # dev needs
+pg_data/
 docker-compose-dev.yml
