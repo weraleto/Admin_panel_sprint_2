@@ -15,9 +15,7 @@ RUN pip install -r requirements.txt
 COPY movies ./movies
 COPY movies_admin ./movies_admin
 COPY manage.py .
-COPY docker/entrypoint.sh .
-RUN chmod +x ./entrypoint.sh
 
 EXPOSE 8000
 
-ENTRYPOINT ["/home/app/movies/entrypoint.sh"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "movies_admin.wsgi"]
