@@ -4,11 +4,11 @@ from dotenv import load_dotenv
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'z=dj%^0%wyi_662gl&@wy4-_zxcod2*&@#r^(')
 
 DEBUG = False
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -50,19 +50,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'movies_admin.wsgi.application'
 
+DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.sqlite3')
+
+# added fallback to sqlite in case .env file doesn't exist
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'ENGINE': DB_ENGINE,
+        'NAME': os.environ.get('DB_NAME', os.path.join(BASE_DIR, '../' + 'movies.sqlite3')),
+        'USER': os.environ.get('DB_USER', 'user'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'password'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': os.environ.get('DB_PORT', 5432),
-        'OPTIONS': {
-            'options': '-c search_path=content,public'
-        }
     }
 }
+
+if 'postgres' in DB_ENGINE:
+    DATABASES['default']['OPTIONS'] = {
+        'options': '-c search_path=content,public'
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
