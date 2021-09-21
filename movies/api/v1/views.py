@@ -44,8 +44,6 @@ class MoviesListView(FilmworkMixinView, BaseListView):
 
         page = paginator.page(page_number)
 
-        print(page.next_page_number() if page.has_next() else None)
-
         context = {
             'count': paginator.count,
             'total_pages': paginator.num_pages,
