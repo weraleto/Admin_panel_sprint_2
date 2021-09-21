@@ -50,3 +50,6 @@ ENV/
 
 # auto generated docs
 doc.html
+
+# dev needs
+docker-compose-dev.yml
