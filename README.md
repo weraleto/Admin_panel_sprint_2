@@ -15,7 +15,9 @@
     - `docker compose up -d`
 5. **В случае, если сборка запускается впервые, нужно выполнить следующие действия:**
    - Необходимо подключиться к контейнеру Django с помощью команды ``docker exec web_admin bash``
-   - Создать суперпользователя ``python manage.py createsuperuser`` 
+   - Провести миграции ``python manage.py migrate``
+   - Создать суперпользователя ``python manage.py createsuperuser``
+   - Загрузить статику ``python manage.py collectstatic --noinput``
    - Отключиться от контейнера: `exit`
 6. Открыть [созданную панель администратора](http://127.0.0.1/) и авторизоваться   
 
