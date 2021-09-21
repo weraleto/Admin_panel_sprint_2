@@ -3,7 +3,7 @@ version: "3"
 services:
   database:
     restart: always
-    image: postgres:13
+    image: postgres:13-alpine
     container_name: movies_database
     env_file:
       - ./movies_admin/.env
@@ -19,8 +19,7 @@ services:
   web_admin:
     restart: always
     build: .
-    command: sh -c "python manage.py collectstatic --noinput &&
-                    gunicorn --bind 0.0.0.0:8000 movies_admin.wsgi"
+    command: sh -c "gunicorn --bind 0.0.0.0:8000 movies_admin.wsgi"
     container_name: movies_admin
     env_file:
       - ./movies_admin/.env
@@ -40,7 +39,7 @@ services:
       - ./nginx/sites:/etc/nginx/conf.d:ro
       - static_volume:/home/app/movies/static
     ports:
-      - "8000:80"
+      - "80:80"
     depends_on:
       - web_admin
     networks:
